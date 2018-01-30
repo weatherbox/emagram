@@ -1,9 +1,12 @@
 import re, json
+import datetime
 import requests
 
 endpoint = 'http://weather.uwyo.edu/cgi-bin/sounding?'
 
 def fetch_all():
+    year, month, dateh = last_datetime()
+
     # JMA sounding points
     # http://www.jma.go.jp/jma/kishou/know/upper/kaisetsu.html#kososite
     ids = ['47401', '47412', '47418', '47582', '47600', '47646', '47678',
@@ -12,17 +15,31 @@ def fetch_all():
 
     data = {}
     for id in ids:
-        data[id] = fetch_point(id)
+        data[id] = fetch_point(id, year, month, dateh)
 
 
-def fetch_point(point_id):
-    url = endpoint + 'TYPE=TEXT%3ALIST&YEAR=2018&MONTH=01&FROM=2612&TO=2612&STNM=' + point_id
+def last_datetime():
+    now = datetime.datetime.utcnow()
+    last = now - datetime.timedelta(hours=2)
+    year = str(last.year)
+    month = last.strftime("%m")
+    dateh = "{:0>2}{:0>2}".format(last.day, int(last.hour / 12) * 12)
+    return year, month, dateh
+
+
+def fetch_point(point_id, year, month, dateh):
+    param = "YEAR={0}&MONTH={1}&FROM={2}&TO={2}&STNM={3}".format(year, month, dateh, point_id)
+    url = endpoint + "TYPE=TEXT%3ALIST&" + param
     req = requests.get(url)
+    
 
     # <H2>47778  Shionomisaki Observations at 12Z 26 Jan 2018</H2>
     h2 = re.findall(r"<H2>(.*?)</H2>", req.text)
+    if len(h2) == 0:
+        print("cannot get: " + url)
+        return
     name = h2[0].split(' ')[2]
-    print(h2[0], name)
+    print(url, h2[0])
 
     # <PRE>data</PRE>
     pre = re.findall(r"<PRE>(.*?)</PRE>", req.text, re.DOTALL)
