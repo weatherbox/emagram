@@ -1,0 +1,6 @@
+{
+	"memory": 128,
+	"timeout": 180,
+	"handler": "main.handler",
+	"runtime": "python3.6"
+}
