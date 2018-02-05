@@ -7,9 +7,7 @@ var margin = {top: 20, right: 10, bottom: 20, left: 30},
     h = 600 - margin.top - margin.bottom;
 
 var basep = 1050,
-    topp = 100,
-    plines = [1000,850,700,500,300,200,100],
-    pticks = [950,900,800,750,650,600,550,450,400,350,250,150];
+    topp = 100;
     
 var svg = d3.select("#emagram").append("svg")
     .attr("width", width)
@@ -29,33 +27,27 @@ d3.json(url, function(data){
 
 
 function drawAxis(){
+    // x: temp
     var xAxis = d3.axisBottom(x)
-            .tickSize(0,0).ticks(10),
-        yAxis = d3.axisLeft(y)
-            .tickSize(0,0).tickValues(plines)
-            .tickFormat(d3.format(".0d"))
-        yAxis2 = d3.axisRight(y)
-            .tickSize(5,0).tickValues(pticks)
-            .tickFormat("");
-
+            .tickSize(-h).ticks(10);
     g.append("g")
         .attr("transform", "translate(0," + h + ")")
-        .call(xAxis);
-    g.append("g").call(yAxis);
+        .call(xAxis)
+        .selectAll(".tick line").attr("stroke", "#ccc"); // grid lines
+
+    // y: log pressure
+    var plines = [1000,850,700,500,300,200,100],
+        pticks = [950,900,800,750,650,600,550,450,400,350,250,150];
+    var yAxis = d3.axisLeft(y)
+            .tickSize(-w).tickValues(plines)
+            .tickFormat(d3.format(".0d"));
+    var yAxis2 = d3.axisRight(y)
+            .tickSize(5).tickValues(pticks)
+            .tickFormat("");
+
+    g.append("g").call(yAxis)
+        .selectAll(".tick:not(:last-of-type) line").attr("stroke", "#ccc"); // grid lines
     g.append("g").call(yAxis2);
-}
-
-
-function drawBackground(){
-
-    svg.selectAll("gline2")
-        .data(plines)
-        .enter().append("line")
-        .attr("x1", 0)
-        .attr("x2", w)
-        .attr("y1", function(d) { return y(d); })
-        .attr("y2", function(d) { return y(d); })
-        .attr("class", "gridline");
 }
 
 
