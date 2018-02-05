@@ -14,6 +14,7 @@ var svg = d3.select("#emagram").append("svg")
     .attr("height", height);
 
 var g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+var lineg = g.append("g");
 
 var x = d3.scaleLinear().range([0, w]).domain([-80, 45]),
     y = d3.scaleLog().range([0, h]).domain([topp, basep]);
@@ -22,7 +23,7 @@ drawAxis();
 
 
 d3.json(url, function(data){
-    console.log(data);
+    drawSounding(data['47778']);
 });
 
 
@@ -48,6 +49,74 @@ function drawAxis(){
     g.append("g").call(yAxis)
         .selectAll(".tick:not(:last-of-type) line").attr("stroke", "#ccc"); // grid lines
     g.append("g").call(yAxis2);
+}
+
+
+/*
+sounding data
+-----------------------------------------------------------------------------
+    key    0      1      2      3      4      5      6      7      8      9
+   PRES   HGHT   TEMP   DWPT   RELH   MIXR   DRCT   SKNT   THTA   THTE   THTV
+    hPa     m      C      C      %    g/kg    deg   knot     K      K      K
+-----------------------------------------------------------------------------
+*/
+
+function drawSounding(data){
+    console.log(data);
+    drawTempLine(data);
+    drawDwptLine(data);
+}
+
+function drawTempLine(data){
+    var tempdata = [];
+    var keys = Object.keys(data.levels);
+    for (var key of keys){
+        var d = data.levels[key];
+        tempdata.push({
+            pres: +key,
+            temp: +d[1],
+        });
+    }
+    
+    var templine = d3.line()
+        .x(function(d) { return x(d.temp); })
+        .y(function(d) { return y(d.pres); });
+
+    var templines = lineg.append("path")
+        .datum(tempdata)
+        .attr("fill", "none")
+        .attr("stroke", "steelblue")
+        .attr("stroke-linejoin", "round")
+        .attr("stroke-linecap", "round")
+        .attr("stroke-width", 1.5)
+        .attr("d", templine);
+}
+
+function drawDwptLine(data){
+    var dwptdata = [];
+    var keys = Object.keys(data.levels);
+    for (var key of keys){
+        var d = data.levels[key];
+        if (d[2]){
+            dwptdata.push({
+                pres: +key,
+                dwpt: +d[2]
+            });
+        }
+    }
+
+    var dwptline = d3.line()
+        .x(function(d) { return x(d.dwpt); })
+        .y(function(d) { return y(d.pres); });
+
+    var dwptlines = lineg.append("path")
+        .datum(dwptdata)
+        .attr("fill", "none")
+        .attr("stroke", "seagreen")
+        .attr("stroke-linejoin", "round")
+        .attr("stroke-linecap", "round")
+        .attr("stroke-width", 1.5)
+        .attr("d", dwptline);
 }
 
 
