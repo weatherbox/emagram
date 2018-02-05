@@ -20,6 +20,7 @@ var x = d3.scaleLinear().range([0, w]).domain([-80, 45]),
     y = d3.scaleLog().range([0, h]).domain([topp, basep]);
 
 drawAxis();
+clipping();
 drawDryAdiabats();
 
 d3.json(url, function(data){
@@ -52,6 +53,19 @@ function drawAxis(){
 }
 
 
+// clip adiabats
+// .attr("clip-path", "url(#clipper)")
+function clipping(){
+    g.append("clipPath")
+        .attr("id", "clipper")
+        .append("rect")
+        .attr("x", 0)
+        .attr("y", 0)
+        .attr("width", w)
+        .attr("height", h);
+}
+
+
 function drawDryAdiabats(){
     var pp = d3.range(topp, basep+1, 10); // plot points
     var dryad = d3.range(-60, 260, 20);
@@ -70,7 +84,8 @@ function drawDryAdiabats(){
         .enter().append("path")
           .attr("fill", "none")
           .attr("stroke", "#ccc")
-          .attr("d", dryline);
+          .attr("d", dryline)
+          .attr("clip-path", "url(#clipper)");
 }
 
 // ref. https://en.wikipedia.org/wiki/Potential_temperature
