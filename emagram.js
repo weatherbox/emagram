@@ -20,7 +20,7 @@ var x = d3.scaleLinear().range([0, w]).domain([-80, 45]),
     y = d3.scaleLog().range([0, h]).domain([topp, basep]);
 
 drawAxis();
-
+drawDryAdiabats();
 
 d3.json(url, function(data){
     drawSounding(data['47778']);
@@ -49,6 +49,33 @@ function drawAxis(){
     g.append("g").call(yAxis)
         .selectAll(".tick:not(:last-of-type) line").attr("stroke", "#ccc"); // grid lines
     g.append("g").call(yAxis2);
+}
+
+
+function drawDryAdiabats(){
+    var pp = d3.range(topp, basep+1, 10); // plot points
+    var dryad = d3.range(-60, 260, 20);
+
+    var dryline = d3.line()
+        .x(function(d,i) { return x(potentialTemperature(d, pp[i])); })
+        .y(function(d,i) { return y(pp[i]); });
+
+    var linepoints = []; // dryad x pp matrix
+    for (var t of dryad){
+        linepoints.push(Array(pp.length).fill(t));
+    }
+
+    g.selectAll(".dryline")
+        .data(linepoints)
+        .enter().append("path")
+          .attr("fill", "none")
+          .attr("stroke", "#ccc")
+          .attr("d", dryline);
+}
+
+// ref. https://en.wikipedia.org/wiki/Potential_temperature
+function potentialTemperature(t, p){
+    return (273.15 + t) / Math.pow((1000 / p), 0.286) - 273.15;
 }
 
 
