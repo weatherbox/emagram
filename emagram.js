@@ -19,9 +19,18 @@ var lineg = g.append("g");
 var x = d3.scaleLinear().range([0, w]).domain([-80, 45]),
     y = d3.scaleLog().range([0, h]).domain([topp, basep]);
 
+// Meteorology Constants
+// https://github.com/Unidata/MetPy/blob/master/metpy/constants.py
+var Rd = 287;
+var Lv = 2.501e+6;
+var Cp_d = 1005;
+var epsilon = 18.01528 / 28.9644;
+
+
 drawAxis();
 clipping();
 drawDryAdiabats();
+drawMoistAdiabats();
 
 d3.json(url, function(data){
     drawSounding(data['47778']);
@@ -68,7 +77,7 @@ function clipping(){
 
 function drawDryAdiabats(){
     var pp = d3.range(topp, basep+1, 10); // plot points
-    var dryad = d3.range(-60, 260, 20);
+    var dryad = d3.range(-60, 200, 20);
 
     var dryline = d3.line()
         .x(function(d,i) { return x(potentialTemperature(d, pp[i])); })
@@ -92,6 +101,78 @@ function drawDryAdiabats(){
 function potentialTemperature(t, p){
     return (273.15 + t) / Math.pow((1000 / p), 0.286) - 273.15;
 }
+
+
+function drawMoistAdiabats(){
+    var moistad = d3.range(-60, 41, 10);
+    var linepoints = moistad.map(function(t){ return moistLapse(t); });
+
+    var moistline = d3.line()
+        .x(function(d) { return x(d[1]); })  // temp
+        .y(function(d) { return y(d[0]); }); // pressure
+
+    g.selectAll(".moistline")
+        .data(linepoints)
+        .enter().append("path")
+          .attr("fill", "none")
+          .attr("stroke", "lightskyblue")
+          .attr("d", moistline)
+          .attr("clip-path", "url(#clipper)");
+}
+
+// integrate moist lapse ratio
+// https://unidata.github.io/MetPy/latest/api/generated/metpy.calc.moist_lapse.html#metpy.calc.moist_lapse
+function moistLapse(baseT){
+    var lapse = [];
+    var dt = 0;
+    var dp = 10;
+
+    // 1000hPa -> basep(1050hPa)
+    var t = baseT;
+    for (var p = 1000; p <= basep; p += dp){
+        var temp = t + dt * dp;
+        lapse.push([p, temp]);
+
+        t = temp;
+        dt = moistLapseRatio(p, temp);
+    }
+    lapse = lapse.reverse();
+
+    // 1000hPa -> topp(100hPa)
+    t = baseT;
+    for (var p = 1000 - dp; p >= topp; p -= dp){
+        var temp = t - dt * dp;
+        lapse.push([p, temp]);
+
+        t = temp;
+        dt = moistLapseRatio(p, temp);
+
+        if (t < -80) break; // out of plot
+    }
+    return lapse;
+}
+
+
+function moistLapseRatio(p, t){
+    var tk = t + 273.15;
+    var rs = saturationMixingRatio(p, t);
+    var frac = (Rd * tk + Lv * rs) /
+                (Cp_d + (Lv * Lv * rs * epsilon / (Rd * tk * tk)));
+    return frac / p;
+}
+
+function saturationMixingRatio(p, t){
+    return mixingRatio(saturationVaporPressure(t), p);
+}
+
+function mixingRatio(part_pres, tot_pres){
+    return 0.622 * part_pres / (tot_pres - part_pres);
+}
+
+function saturationVaporPressure(temp){
+    return 6.112 * Math.exp(17.67 * temp / (temp + 243.5));
+}
+
 
 
 /*
