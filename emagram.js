@@ -27,17 +27,17 @@ var Cp_d = 1005;
 var epsilon = 18.01528 / 28.9644;
 
 
-drawAxis();
+plotAxis();
 clipping();
-drawDryAdiabats();
-drawMoistAdiabats();
+plotDryAdiabats();
+plotMoistAdiabats();
 
 d3.json(url, function(data){
-    drawSounding(data['47778']);
+    plot(data['47778']);
 });
 
 
-function drawAxis(){
+function plotAxis(){
     // x: temp
     var xAxis = d3.axisBottom(x)
             .tickSize(-h).ticks(10);
@@ -75,7 +75,7 @@ function clipping(){
 }
 
 
-function drawDryAdiabats(){
+function plotDryAdiabats(){
     var pp = d3.range(topp, basep+1, 10); // plot points
     var dryad = d3.range(-60, 200, 20);
 
@@ -103,7 +103,7 @@ function potentialTemperature(t, p){
 }
 
 
-function drawMoistAdiabats(){
+function plotMoistAdiabats(){
     // equal interval moist and dry adiabats
     var moistad = [-50, -30, -13.5, 0, 10, 16.6, 22.2, 26.2, 29.5, 32.2, 34.7, 37.0];
     var linepoints = moistad.map(function(t){ return moistLapse(t); });
@@ -180,19 +180,19 @@ function saturationVaporPressure(temp){
 /*
 sounding data
 -----------------------------------------------------------------------------
-    key    0      1      2      3      4      5      6      7      8      9
-   PRES   HGHT   TEMP   DWPT   RELH   MIXR   DRCT   SKNT   THTA   THTE   THTV
-    hPa     m      C      C      %    g/kg    deg   knot     K      K      K
+  key    0      1      2      3      4      5      6      7      8      9
+  PRES   HGHT   TEMP   DWPT   RELH   MIXR   DRCT   SKNT   THTA   THTE   THTV
+  hPa     m      C      C      %     g/kg   deg    knot    K      K      K
 -----------------------------------------------------------------------------
 */
 
-function drawSounding(data){
+function plot(data){
     console.log(data);
-    drawTempLine(data);
-    drawDwptLine(data);
+    plotTempLine(data);
+    plotDwptLine(data);
 }
 
-function drawTempLine(data){
+function plotTempLine(data){
     var tempdata = [];
     var keys = Object.keys(data.levels);
     for (var key of keys){
@@ -217,7 +217,7 @@ function drawTempLine(data){
         .attr("d", templine);
 }
 
-function drawDwptLine(data){
+function plotDwptLine(data){
     var dwptdata = [];
     var keys = Object.keys(data.levels);
     for (var key of keys){
