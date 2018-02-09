@@ -127,25 +127,26 @@ function moistLapse(baseT){
     var dt = 0;
     var dp = 10;
 
+    // start point
+    lapse.push([1000, baseT]);
+
     // 1000hPa -> basep(1050hPa)
     var t = baseT;
-    for (var p = 1000; p <= basep; p += dp){
+    for (var p = 1000 + dp; p <= basep; p += dp){
+        var dt = moistLapseRatio(p, t);
         var temp = t + dt * dp;
         lapse.push([p, temp]);
-
         t = temp;
-        dt = moistLapseRatio(p, temp);
     }
     lapse = lapse.reverse();
 
     // 1000hPa -> topp(100hPa)
     t = baseT;
     for (var p = 1000 - dp; p >= topp; p -= dp){
+        var dt = moistLapseRatio(p, t);
         var temp = t - dt * dp;
         lapse.push([p, temp]);
-
         t = temp;
-        dt = moistLapseRatio(p, temp);
 
         if (t < -80) break; // out of plot
     }
