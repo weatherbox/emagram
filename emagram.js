@@ -104,7 +104,8 @@ function potentialTemperature(t, p){
 
 
 function drawMoistAdiabats(){
-    var moistad = d3.range(-60, 41, 10);
+    // equal interval moist and dry adiabats
+    var moistad = [-50, -30, -13.5, 0, 10, 16.6, 22.2, 26.2, 29.5, 32.2, 34.7, 37.0];
     var linepoints = moistad.map(function(t){ return moistLapse(t); });
 
     var moistline = d3.line()
