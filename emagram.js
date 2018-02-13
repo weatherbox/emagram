@@ -31,6 +31,7 @@ plotAxis();
 clipping();
 plotDryAdiabats();
 plotMoistAdiabats();
+plotMixingLines();
 
 d3.json(url, function(data){
     plot(data['47778']);
@@ -175,6 +176,20 @@ function saturationVaporPressure(temp){
     return 6.112 * Math.exp(17.67 * temp / (temp + 243.5));
 }
 
+
+function plotMixingLines(){
+
+}
+
+
+function dewpoint(e){
+    var v = Math.log(e / 6.112);
+    return 243.5 * v / (17.67 - v);
+}
+
+function vaporPressure(pres, mixing){
+    return press * mixing / (epsilon + mixing);
+}
 
 
 /*
