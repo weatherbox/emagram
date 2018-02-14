@@ -93,7 +93,8 @@ function plotDryAdiabats(){
         .data(linepoints)
         .enter().append("path")
           .attr("fill", "none")
-          .attr("stroke", "#ccc")
+          .attr("stroke", "#F5B2B2")
+          .attr("stroke-opacity", "0.5")
           .attr("d", dryline)
           .attr("clip-path", "url(#clipper)");
 }
@@ -117,7 +118,8 @@ function plotMoistAdiabats(){
         .data(linepoints)
         .enter().append("path")
           .attr("fill", "none")
-          .attr("stroke", "lightskyblue")
+          .attr("stroke", "#A3BCE2")
+          .attr("stroke-opacity", "0.5")
           .attr("d", moistline)
           .attr("clip-path", "url(#clipper)");
 }
@@ -184,7 +186,6 @@ function plotMixingLines(){
     for (var m of mixing){
         linepoints.push(pp.map(function(p){ return [p, dewpoint(vaporPressure(p, m))]; }));
     }
-    console.log(linepoints);
 
     var mixingline = d3.line()
         .x(function(d) { return x(d[1]); })  // temp
@@ -194,7 +195,8 @@ function plotMixingLines(){
         .data(linepoints)
         .enter().append("path")
           .attr("fill", "none")
-          .attr("stroke", "darkgreen")
+          .attr("stroke", "#A5D4AD")
+          .attr("stroke-opacity", "0.5")
           .attr("d", mixingline)
           .attr("clip-path", "url(#clipper)");
 }
@@ -243,10 +245,10 @@ function plotTempLine(data){
     var templines = lineg.append("path")
         .datum(tempdata)
         .attr("fill", "none")
-        .attr("stroke", "steelblue")
+        .attr("stroke", "#E9546B")
         .attr("stroke-linejoin", "round")
         .attr("stroke-linecap", "round")
-        .attr("stroke-width", 1.5)
+        .attr("stroke-width", 2)
         .attr("d", templine);
 }
 
@@ -270,10 +272,10 @@ function plotDwptLine(data){
     var dwptlines = lineg.append("path")
         .datum(dwptdata)
         .attr("fill", "none")
-        .attr("stroke", "seagreen")
+        .attr("stroke", "#00A95F")
         .attr("stroke-linejoin", "round")
         .attr("stroke-linecap", "round")
-        .attr("stroke-width", 1.5)
+        .attr("stroke-width", 2)
         .attr("d", dwptline);
 }
 
