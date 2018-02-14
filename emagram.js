@@ -178,7 +178,25 @@ function saturationVaporPressure(temp){
 
 
 function plotMixingLines(){
+    var pp = d3.range(500, basep+1, 10);
+    var mixing = [0.001, 0.002, 0.004, 0.007, 0.01, 0.016, 0.024, 0.032];
+    var linepoints = [];
+    for (var m of mixing){
+        linepoints.push(pp.map(function(p){ return [p, dewpoint(vaporPressure(p, m))]; }));
+    }
+    console.log(linepoints);
 
+    var mixingline = d3.line()
+        .x(function(d) { return x(d[1]); })  // temp
+        .y(function(d) { return y(d[0]); }); // pressure
+
+    g.selectAll(".mixingline")
+        .data(linepoints)
+        .enter().append("path")
+          .attr("fill", "none")
+          .attr("stroke", "darkgreen")
+          .attr("d", mixingline)
+          .attr("clip-path", "url(#clipper)");
 }
 
 
@@ -188,7 +206,7 @@ function dewpoint(e){
 }
 
 function vaporPressure(pres, mixing){
-    return press * mixing / (epsilon + mixing);
+    return pres * mixing / (epsilon + mixing);
 }
 
 
