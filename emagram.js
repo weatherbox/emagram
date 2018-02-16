@@ -333,8 +333,9 @@ function makeBarbTemplates() {
      		thisbarb.append("polyline")
                 .attr("points", "0,"+px+" -10,"+(px)+" 0,"+(px-4))
      		    .attr("class", "flag");
-     		 px -= 7;
+     		 px -= 5;
      	}
+        if (flags > 0) px -= 2;
 	    // Draw pennants on each barb
 	    for (i=0; i<pennants; i++) {
     	    thisbarb.append("line")
