@@ -14,7 +14,6 @@ var svg = d3.select("#emagram").append("svg")
     .attr("height", height);
 
 var g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-var lineg = g.append("g");
 
 var x = d3.scaleLinear().range([0, w]).domain([-80, 45]),
     y = d3.scaleLog().range([0, h]).domain([topp, basep]);
@@ -32,6 +31,8 @@ clipping();
 plotDryAdiabats();
 plotMoistAdiabats();
 plotMixingLines();
+
+var lineg = g.append("g");
 
 d3.json(url, function(data){
     plot(data['47778']);
@@ -249,7 +250,8 @@ function plotTempLine(data){
         .attr("stroke-linejoin", "round")
         .attr("stroke-linecap", "round")
         .attr("stroke-width", 2)
-        .attr("d", templine);
+        .attr("d", templine)
+        .attr("clip-path", "url(#clipper)");
 }
 
 function plotDwptLine(data){
@@ -276,7 +278,8 @@ function plotDwptLine(data){
         .attr("stroke-linejoin", "round")
         .attr("stroke-linecap", "round")
         .attr("stroke-width", 2)
-        .attr("d", dwptline);
+        .attr("d", dwptline)
+        .attr("clip-path", "url(#clipper)");
 }
 
 
