@@ -2,7 +2,7 @@ var url = "https://s3-ap-northeast-1.amazonaws.com/soundings/sounding-current.js
 
 var width = 600, height = 600;
 
-var margin = {top: 20, right: 10, bottom: 20, left: 30},
+var margin = {top: 20, right: 30, bottom: 20, left: 30},
     w = 600 - margin.left - margin.right,
     h = 600 - margin.top - margin.bottom;
 
@@ -14,6 +14,8 @@ var svg = d3.select("#emagram").append("svg")
     .attr("height", height);
 
 var g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+var backg = g.append("g"),
+    lineg = g.append("g");
 
 var x = d3.scaleLinear().range([0, w]).domain([-80, 45]),
     y = d3.scaleLog().range([0, h]).domain([topp, basep]);
@@ -26,24 +28,27 @@ var Cp_d = 1005;
 var epsilon = 18.01528 / 28.9644;
 
 
-plotAxis();
-clipping();
-plotDryAdiabats();
-plotMoistAdiabats();
-plotMixingLines();
-
-var lineg = g.append("g");
+plotBackground();
 
 d3.json(url, function(data){
     plot(data['47778']);
 });
 
 
+function plotBackground(){
+    plotAxis();
+    clipping();
+    plotDryAdiabats();
+    plotMoistAdiabats();
+    plotMixingLines();
+    makeBarbTemplates();
+}
+
 function plotAxis(){
     // x: temp
     var xAxis = d3.axisBottom(x)
             .tickSize(-h).ticks(10);
-    g.append("g")
+    backg.append("g")
         .attr("transform", "translate(0," + h + ")")
         .call(xAxis)
         .selectAll(".tick line").attr("stroke", "#ccc"); // grid lines
@@ -58,9 +63,9 @@ function plotAxis(){
             .tickSize(5).tickValues(pticks)
             .tickFormat("");
 
-    g.append("g").call(yAxis)
+    backg.append("g").call(yAxis)
         .selectAll(".tick:not(:last-of-type) line").attr("stroke", "#ccc"); // grid lines
-    g.append("g").call(yAxis2);
+    backg.append("g").call(yAxis2);
 }
 
 
@@ -90,7 +95,7 @@ function plotDryAdiabats(){
         linepoints.push(Array(pp.length).fill(t));
     }
 
-    g.selectAll(".dryline")
+    backg.selectAll(".dryline")
         .data(linepoints)
         .enter().append("path")
           .attr("fill", "none")
@@ -115,7 +120,7 @@ function plotMoistAdiabats(){
         .x(function(d) { return x(d[1]); })  // temp
         .y(function(d) { return y(d[0]); }); // pressure
 
-    g.selectAll(".moistline")
+    backg.selectAll(".moistline")
         .data(linepoints)
         .enter().append("path")
           .attr("fill", "none")
@@ -192,7 +197,7 @@ function plotMixingLines(){
         .x(function(d) { return x(d[1]); })  // temp
         .y(function(d) { return y(d[0]); }); // pressure
 
-    g.selectAll(".mixingline")
+    backg.selectAll(".mixingline")
         .data(linepoints)
         .enter().append("path")
           .attr("fill", "none")
@@ -226,6 +231,7 @@ function plot(data){
     console.log(data);
     plotTempLine(data);
     plotDwptLine(data);
+    plotWindBarb(data);
 }
 
 function plotTempLine(data){
@@ -282,4 +288,71 @@ function plotDwptLine(data){
         .attr("clip-path", "url(#clipper)");
 }
 
+function plotWindBarb(data){
+    var winddata = [];
+    var keys = Object.keys(data.levels);
+    for (var key of keys){
+        var d = data.levels[key];
+        if (key < topp) break;
+        if (d[6]){
+            winddata.push({
+                pres: +key,
+                dir: +d[5],
+                speed: Math.round(d[6] / 5) * 5 
+            });
+        }
+    }
+
+    barbs = lineg.selectAll("barbs")
+        .data(winddata).enter()
+        .append("use")
+    	.attr("xlink:href", function (d) { return "#barb"+d.speed; })
+    	.attr("transform", function(d) { return "translate("+ w +","+ y(d.pres) +") rotate("+ (d.dir+180) +")"; });
+}
+
+
+function makeBarbTemplates() {
+    var barbsize = 25;
+    var speeds = d3.range(5, 205, 5);
+    barbdef = svg.append('defs');
+    speeds.forEach(function(d) {
+    	var thisbarb = barbdef.append('g')
+            .attr('id', 'barb'+d)
+            .attr('class', 'windbarb');
+    	
+    	var flags = Math.floor(d/50);
+        var pennants = Math.floor((d - flags*50)/10);
+        var halfpennants = Math.floor((d - flags*50 - pennants*10)/5);
+        var px = barbsize;
+        	    
+		// Draw wind barb stems
+		thisbarb.append("line").attr("x1", 0).attr("x2", 0).attr("y1", 0).attr("y2", barbsize);
+     
+    	// Draw wind barb flags and pennants for each stem
+	    for (i=0; i<flags; i++) {
+     		thisbarb.append("polyline")
+                .attr("points", "0,"+px+" -10,"+(px)+" 0,"+(px-4))
+     		    .attr("class", "flag");
+     		 px -= 7;
+     	}
+	    // Draw pennants on each barb
+	    for (i=0; i<pennants; i++) {
+    	    thisbarb.append("line")
+     		    .attr("x1", 0)
+     		    .attr("x2", -10)
+     		    .attr("y1", px)
+     		    .attr("y2", px+4)
+     		 px -= 3;
+     	}
+     	// Draw half-pennants on each barb
+        for (i=0; i<halfpennants; i++) {
+    	    thisbarb.append("line")
+     		    .attr("x1", 0)
+     		    .attr("x2", -5)
+     		    .attr("y1", px)
+     		    .attr("y2", px+2)
+     		px -= 3;
+     	}
+    });
+}
 
