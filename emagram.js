@@ -407,6 +407,15 @@ function initTooltip(tempdata, levels){
         .attr("dy", -2)
         .attr("text-anchor", "start");
 
+    var focusDwpt = focus.append("g");
+    focusDwpt.append("circle")
+        .attr("r", 4)
+        .attr("fill", "#00A95F");
+    var focusDwptText = focusDwpt.append("text")
+        .attr("x", -4)
+        .attr("dy", -2)
+        .attr("text-anchor", "end");
+
     g.append("rect")
         .attr("width", w)
         .attr("height", h)
@@ -436,9 +445,19 @@ function initTooltip(tempdata, levels){
 
         focus.attr("transform", "translate(0," + y(d.pres) + ")");
         focusY.text(d.pres + "hPa " + Math.round(l[0]/100)/10 + "km");
+
         focusTemp.attr("transform", "translate(" + x(l[1]) + ",0)");
         focusTempText.text(l[1] + "℃")
             .attr("dy", (l[1] < -60) ? 12 : -2); 
+
+        if (l[2]){
+            focusDwpt.style("display", null)
+                .attr("transform", "translate(" + x(l[2]) + ",0)");
+            focusDwptText.text(l[2] + "℃")
+                .attr("dy", (l[2] < -60) ? 12 : -2);
+        }else{
+            focusDwpt.style("display", "none");
+        }
     }
 }
 
