@@ -398,6 +398,14 @@ function initTooltip(tempdata, levels){
         .attr("dy", -2)
         .attr("text-anchor", "start");
 
+    var focusTemp = focus.append("g");
+    focusTemp.append("circle")
+        .attr("r", 4)
+        .attr("fill", "#E9546B");
+    var focusTempText = focusTemp.append("text")
+        .attr("x", 4)
+        .attr("dy", -2)
+        .attr("text-anchor", "start");
 
     g.append("rect")
         .attr("width", w)
@@ -428,6 +436,9 @@ function initTooltip(tempdata, levels){
 
         focus.attr("transform", "translate(0," + y(d.pres) + ")");
         focusY.text(d.pres + "hPa " + Math.round(l[0]/100)/10 + "km");
+        focusTemp.attr("transform", "translate(" + x(l[1]) + ",0)");
+        focusTempText.text(l[1] + "℃")
+            .attr("dy", (l[1] < -60) ? 12 : -2); 
     }
 }
 
