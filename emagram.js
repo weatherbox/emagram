@@ -259,7 +259,7 @@ function plotTempLine(data){
         .attr("d", templine)
         .attr("clip-path", "url(#clipper)");
     
-    initTooltip(tempdata, data);
+    initTooltip(tempdata, data.levels);
 }
 
 function plotDwptLine(data){
@@ -378,9 +378,26 @@ function makeBarbTemplates() {
 }
 
 
-function initTooltip(tempdata, data){
+function initTooltip(tempdata, levels){
     var bisectdata = tempdata.reverse();
     var bisect = d3.bisector(function(d){ return d.pres; }).left;
+
+    var focus = g.append("g")
+        .attr("class", "focus")
+        .style("display", "none");
+
+    focus.append("line")
+        .attr("class", "y-hover-line")
+        .attr("x1", 0)
+        .attr("x2", w)
+        .attr("stroke", "#999")
+        .attr("opacity", 0.7);
+
+    var focusY = focus.append("text")
+        .attr("x", 4)
+        .attr("dy", -2)
+        .attr("text-anchor", "start");
+
 
     g.append("rect")
         .attr("width", w)
@@ -393,11 +410,11 @@ function initTooltip(tempdata, data){
 
 
     function showTooltip(){
-
+        focus.style("display", null);
     }
 
     function hideTooltip(){
-
+        focus.style("display", "none");
     }
 
     function mousemove(){
@@ -406,7 +423,11 @@ function initTooltip(tempdata, data){
         var d0 = bisectdata[i - 1];
         var d1 = bisectdata[i];
         var d = (p - d0.pres > d1.pres - p) ? d1 : d0;
-        console.log(d.pres);
+        var l = levels[d.pres + ".0"];
+        console.log(d.pres, l);
+
+        focus.attr("transform", "translate(0," + y(d.pres) + ")");
+        focusY.text(d.pres + "hPa " + Math.round(l[0]/100)/10 + "km");
     }
 }
 
