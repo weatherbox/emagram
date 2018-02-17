@@ -258,6 +258,8 @@ function plotTempLine(data){
         .attr("stroke-width", 2)
         .attr("d", templine)
         .attr("clip-path", "url(#clipper)");
+    
+    initTooltip(tempdata, data);
 }
 
 function plotDwptLine(data){
@@ -373,5 +375,38 @@ function makeBarbTemplates() {
      		px -= 3;
      	}
     });
+}
+
+
+function initTooltip(tempdata, data){
+    var bisectdata = tempdata.reverse();
+    var bisect = d3.bisector(function(d){ return d.pres; }).left;
+
+    g.append("rect")
+        .attr("width", w)
+        .attr("height", h)
+        .attr("fill", "none")
+        .attr("pointer-events", "all")
+        .on("mouseover", showTooltip)
+        .on("mouseout", hideTooltip)
+        .on("mousemove", mousemove);
+
+
+    function showTooltip(){
+
+    }
+
+    function hideTooltip(){
+
+    }
+
+    function mousemove(){
+        var p = y.invert(d3.mouse(this)[1]); // get y:pressure of mouse pointer
+        var i = bisect(bisectdata, p, 1, bisectdata.length - 1);
+        var d0 = bisectdata[i - 1];
+        var d1 = bisectdata[i];
+        var d = (p - d0.pres > d1.pres - p) ? d1 : d0;
+        console.log(d.pres);
+    }
 }
 
