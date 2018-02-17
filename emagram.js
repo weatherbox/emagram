@@ -289,8 +289,26 @@ function plotDwptLine(data){
 }
 
 function plotWindBarb(data){
+    var keys = [];
+    var prev = 1000;
+    var interval = 20;
+    for (var k of Object.keys(data.levels)){
+        if (keys.length == 0) keys.push(k); // surface
+
+        if (prev - k > interval && prev % 50 != 0){
+            keys.push(prev);
+        }
+
+        if (k % 50 == 0){
+            keys.push(k);
+            prev = k;
+
+        }else if (prev - k > interval){
+            prev = k;
+        }
+    }
+
     var winddata = [];
-    var keys = Object.keys(data.levels);
     for (var key of keys){
         var d = data.levels[key];
         if (key < topp) break;
