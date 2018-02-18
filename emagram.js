@@ -229,9 +229,16 @@ sounding data
 
 function plot(data){
     console.log(data);
+    title(data);
     plotTempLine(data);
     plotDwptLine(data);
     plotWindBarb(data);
+}
+
+function title(data){
+    var time = d3.timeParse("%y%m%d/%H%M")(data.indices.TIME); // 180218/0000
+    var timestr = d3.timeFormat("%HZ %d %b %Y")(time);
+    d3.select("h2").text(data.name + "  " + timestr);
 }
 
 function plotTempLine(data){
@@ -441,7 +448,7 @@ function initTooltip(tempdata, levels){
         var d1 = bisectdata[i];
         var d = (p - d0.pres > d1.pres - p) ? d1 : d0;
         var l = levels[d.pres + ".0"];
-        console.log(d.pres, l);
+        //console.log(d.pres, l);
 
         focus.attr("transform", "translate(0," + y(d.pres) + ")");
         focusY.text(d.pres + "hPa " + Math.round(l[0]/100)/10 + "km");
