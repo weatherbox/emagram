@@ -451,7 +451,7 @@ function initTooltip(tempdata, levels){
         //console.log(d.pres, l);
 
         focus.attr("transform", "translate(0," + y(d.pres) + ")");
-        focusY.text(d.pres + "hPa " + Math.round(l[0]/100)/10 + "km");
+        focusY.text(d.pres + "hPa " + l[0] + "m");
 
         focusTemp.attr("transform", "translate(" + x(l[1]) + ",0)");
         focusTempText.text(l[1] + "℃")
