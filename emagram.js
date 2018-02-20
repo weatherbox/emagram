@@ -461,7 +461,7 @@ function initTooltip(tempdata, levels){
             focusDwpt.style("display", null)
                 .attr("transform", "translate(" + x(l[2]) + ",0)");
             focusDwptText.text(l[2] + "℃")
-                .attr("dy", (l[2] < -60) ? 12 : -2);
+                .attr("dy", (l[2] < -50) ? 12 : -2);
         }else{
             focusDwpt.style("display", "none");
         }
