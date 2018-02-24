@@ -21,8 +21,8 @@ class Emagram {
 
     initSVG (){
         // plot width, height
-        this.w = 600 - margin.left - margin.right,
-        this.h = 600 - margin.top - margin.bottom;
+        this.w = this.width - margin.left - margin.right,
+        this.h = this.height - margin.top - margin.bottom;
 
         // groups
         this.g = this.svg.append("g")
@@ -168,6 +168,10 @@ class Emagram {
         this.plotWindBarb(data);
     }
 
+    clear (){
+        this.lineg.remove();
+        this.lineg = this.g.append("g");
+    }
 
     plotTempLine (data){
         var tempdata = [];
