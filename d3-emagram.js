@@ -12,8 +12,7 @@ class Emagram {
         this.height = height;
         
         this.svg = d3.select(divid).append("svg")
-            .attr("width", width)
-            .attr("height", height);
+            .attr("viewBox", "0 0 " + width + " " + height);
 
         this.initSVG();
         this.plotBackground();
@@ -349,13 +348,13 @@ class Emagram {
             focusY.text(d.pres + "hPa " + l[0] + "m");
 
             focusTemp.attr("transform", "translate(" + x(l[1]) + ",0)");
-            focusTempText.text(l[1] + "℃")
+            focusTempText.text(l[1].toFixed(1) + "℃")
                 .attr("dy", (l[1] < -60) ? 12 : -2); 
 
             if (l[2]){
                 focusDwpt.style("display", null)
                     .attr("transform", "translate(" + x(l[2]) + ",0)");
-                focusDwptText.text(l[2] + "℃")
+                focusDwptText.text(l[2].toFixed(1) + "℃")
                     .attr("dy", (l[2] < -50) ? 12 : -2);
             }else{
                 focusDwpt.style("display", "none");
