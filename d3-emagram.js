@@ -281,7 +281,8 @@ class Emagram {
 
         var focus = this.g.append("g")
             .attr("class", "focus")
-            .style("display", "none");
+            .style("display", "none")
+            .style("font-size", 10);
 
         focus.append("line")
             .attr("class", "y-hover-line")
@@ -445,11 +446,13 @@ function vaporPressure(pres, mixing){
 function makeBarbTemplates(svg) {
     var barbsize = 25;
     var speeds = d3.range(5, 205, 5);
-    barbdef = svg.append('defs');
+    var barbdef = svg.append('defs')
+
     speeds.forEach(function(d) {
     	var thisbarb = barbdef.append('g')
             .attr('id', 'barb'+d)
-            .attr('class', 'windbarb');
+            .attr("stroke", "#000")
+            .attr("stroke-width", 0.75);
     	
     	var flags = Math.floor(d/50);
         var pennants = Math.floor((d - flags*50)/10);
@@ -463,7 +466,7 @@ function makeBarbTemplates(svg) {
 	    for (i=0; i<flags; i++) {
      		thisbarb.append("polyline")
                 .attr("points", "0,"+px+" -10,"+(px)+" 0,"+(px-4))
-     		    .attr("class", "flag");
+     		    .attr("fill", "#000");
      		 px -= 5;
      	}
         if (flags > 0) px -= 2;
